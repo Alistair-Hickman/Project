@@ -13,8 +13,8 @@ MAD_results = []
 time_tot = 10*60 #Total sim time in seconds
 #Run speed in microns/second
 run_speed = 20
-#Corresponding frequency
-freq = 1/run_speed
+#Corresponding frequency-needs to be 100Hz
+freq = 100 
 #Total steps
 steps = time_tot/freq
 print(steps)
