@@ -33,33 +33,6 @@ def MSD(pos_arr):
   displacements = []
   tau = []
 
-#CHECK TIME RANGE
-  for j in range(5000,6500):
-    for i in range(1, len(pos_arr)):
-         if (i-j) > 0:
-          disp_x = pos_arr[i][0] - pos_arr[i-j][0]
-          disp_y = pos_arr[i][1] - pos_arr[i-j][1]
-          disp_z = pos_arr[i][2] - pos_arr[i-j][2]
-          disp = (disp_y*disp_y + disp_x*disp_x + disp_z*disp_z)
-          displacements.append(disp)
-    MSD = np.mean(displacements)
-    displacements.clear()
-    MSD_values.append(MSD)
-    tau.append(j)
-
-  fig, gr=plt.subplots()
-  gr.plot(tau, MSD_values)
-  gr.set_title('R.Spheroides MSD Graph')
-  gr.set(xlabel = 'tau', ylabel = 'MSD (E-6 m^2)')
-  fig.savefig('R.Sphaeroides_MSD.png',dpi=80)
-  #combine data to a single array, transpose and save
-  #savetxt('MSD_data.txt', MSD_values)
-
-  slope,intercept = np.polyfit(tau, MSD_values, 1)
-  #CHECK CORRECTION
-  D = slope*freq/6
-  print("D_eff =", D)
-
 def MAD(angles):
   MAD_values = []
   ang_displacements = []
@@ -219,7 +192,7 @@ plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
 pos_arr = np.array([xpos_arr, ypos_arr, zpos_arr])
 pos_arr = pos_arr.T
 np.savetxt('trajectory_file.csv', pos_arr)
-#Mean_Square_Disp=MSD(pos_arr)
+
 
 Mean_S_Ang_Disp=MAD(angles)
 Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
