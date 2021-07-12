@@ -20,11 +20,13 @@ steps = time_tot*freq
 #mean stop duration in seconds and corresponding variables
 mean_stop =  1
 stop_steps = mean_stop * freq
-stop_lambd = 1/stop_steps
+stop_lambd = 1.0/stop_steps
 #mean run time in seconds and corresponding variables
 mean_run = 3
 run_steps = mean_run * freq
-run_lambd = 1/run_steps
+run_lambd = 1.0/run_steps
+
+no_runs = int(time_tot/(mean_run + mean_stop))
 #Mean Square Displacement Fucntion
 def MSD(pos_arr):
   MSD_values = []
@@ -54,7 +56,8 @@ def MSD(pos_arr):
   #savetxt('MSD_data.txt', MSD_values)
 
   slope,intercept = np.polyfit(tau, MSD_values, 1)
-  D = slope*run_speed/6
+  #CHECK CORRECTION
+  D = slope*freq/6
   print("D_eff =", D)
 
 def MAD(angles):
@@ -112,10 +115,10 @@ def rotate(vector):
 
     return new_vector
 
-#def stop(swim):
+def stop(swim):
     #Stop duration in uniform between 0.5-1.5s
-    stop_duration = random.gauss(20,5)
-    #Needs int rounding but allows stop duration to nearest 0.05s. Okay, could be better
+    stop_duration = random.expovariate(stop_lambd)
+    #Needs int rounding but allows stop duration to nearest 0.01s. Okay, could be better
     int_stop = int(stop_duration)
     for i in range(int_stop):
         xpos_arr.append(x_pos)
@@ -179,14 +182,8 @@ old_vector = np.array([x,
 vectors = []
 angles = []
 
-#adj_steps = int((3/((mean_stop/20)+3))*steps)
-
-
-adj_steps = steps/(mean_run*run_speed + mean_stop*run_speed)
-int_steps = int(adj_steps)
-print("steps=", int_steps)
  #first loop
-for i in range(int_steps):
+for i in range(no_runs):
     step = []
     #second loop is run through once per step, generating a new x, y & z vector
     #These are added to the previous values
@@ -198,26 +195,19 @@ for i in range(int_steps):
         ypos_arr.append(y_pos)
         zpos_arr.append(z_pos)
         #Add  vector to each position
-        x_pos = x_pos + swim[0]
-        y_pos = y_pos + swim[1]
-        z_pos = z_pos + swim[2]
+        x_pos = x_pos + swim[0]/4.642
+        y_pos = y_pos + swim[1]/4.642
+        z_pos = z_pos + swim[2]/4.642
         #Reset vector to an old vector
         vectors.append(swim)
         #Apply the tumble function to tumble 60* with a random rotation about the z axis
         swim = rotate(swim)
         old_vector = swim
-    for i in range(int_stop):
-        xpos_arr.append(x_pos)
-        ypos_arr.append(y_pos)
-        zpos_arr.append(z_pos)
-        swim = stop_rotate(swim)
-        vectors.append(swim)
+    swim = stop(swim)
     dot = swim @ old_vector
     angles.append(dot)
-        #print(x_pos,y_pos,z_pos)
-        #dot product angle test.
-#Test change
- #The arrays are plotted in 3 dimensions against each other
+
+#The arrays are plotted in 3 dimensions against each other
 ax = plt.axes(projection='3d')
 ax.plot3D(xpos_arr, ypos_arr, zpos_arr)
 ax.set_xlabel('X axis(um)')
@@ -229,7 +219,7 @@ plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
 pos_arr = np.array([xpos_arr, ypos_arr, zpos_arr])
 pos_arr = pos_arr.T
 np.savetxt('trajectory_file.csv', pos_arr)
-Mean_Square_Disp=MSD(pos_arr)
+#Mean_Square_Disp=MSD(pos_arr)
 
 Mean_S_Ang_Disp=MAD(angles)
 Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
