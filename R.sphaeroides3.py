@@ -10,24 +10,28 @@ MAD_results = []
 
 
 
-time_tot = 10*60 #Total sim time in seconds
+time_tot = 5*60 #Total sim time in seconds
 #Run speed in microns/second
 run_speed = 20
 #Corresponding frequency-needs to be 100Hz
-freq = 100 
+freq = 100
 #Total steps
-steps = time_tot/freq
-print(steps)
-#mean stop duration input = seconds * 20
+steps = time_tot*freq
+#mean stop duration in seconds and corresponding variables
 mean_stop =  1
-#mean run time in seconds
+stop_steps = mean_stop * freq
+stop_lambd = 1/stop_steps
+#mean run time in seconds and corresponding variables
 mean_run = 3
+run_steps = mean_run * freq
+run_lambd = 1/run_steps
 #Mean Square Displacement Fucntion
 def MSD(pos_arr):
   MSD_values = []
   displacements = []
   tau = []
 
+#CHECK TIME RANGE
   for j in range(5000,6500):
     for i in range(1, len(pos_arr)):
          if (i-j) > 0:
@@ -91,7 +95,8 @@ def rotate(vector):
     else:
        phi = math.atan2((vector_y),(vector_x))
     #Alpha is angle rotated away from current axis, calculated randomly in every instance
-    alpha = random.gauss(0, 4*0.062*0.025)
+    #CHANGE FOR FREQ CHANGE
+    alpha = random.gauss(0, 4*0.062*0.01)
     #Call first rotation matrix with random alpha
     #and multiply to 0,0,1 vector
     rot_1 = rotate_y(alpha) @ [0,0,1]
@@ -134,7 +139,8 @@ def stop_rotate(vector):
     else:
        phi = math.atan2((vector_y),(vector_x))
     #Alpha is angle rotated away from current axis, calculated randomly in every instance
-    alpha = random.gauss(0, 4*0.12*0.025)
+    #CHANGE FOR FREQ
+    alpha = random.gauss(0, 4*0.12*0.01)
     #Call first rotation matrix with random alpha
     #and multiply to 0,0,1 vector
     rot_1 = rotate_y(alpha) @ [0,0,1]
@@ -184,12 +190,8 @@ for i in range(int_steps):
     step = []
     #second loop is run through once per step, generating a new x, y & z vector
     #These are added to the previous values
-    run_time = random.gauss(60,10)
+    run_time = random.expovariate(run_lambd)
     int_run = int(run_time)
-    #Stop duration in uniform between 0.5-1.5s
-    stop_duration = random.gauss(20,5)
-    #Needs int rounding but allows stop duration to nearest 0.05s. Okay, could be better
-    int_stop = int(stop_duration)
     for k in range(int_run):
         #Save cooridnates in respective arrays starting at origin
         xpos_arr.append(x_pos)

@@ -17,6 +17,8 @@ run_speed = 20
 stop_duration =  20
 #run time in seconds
 run_time = 3
+run_steps = run_time * run_speed
+run_lambd = 1/run_steps
 #Mean Square Displacement Fucntion
 def MSD(pos_arr):
   MSD_values = []
@@ -109,7 +111,6 @@ def stop(swim):
         zpos_arr.append(z_pos)
         swim = stop_rotate(swim)
         vectors.append(swim)
-
     return swim
 
 
@@ -187,7 +188,8 @@ for i in range(adj_steps):
         #Apply the tumble function to tumble 60* with a random rotation about the z axis
         swim = rotate(swim)
         old_vector = swim
-        if (i % run_time*run_speed == 0):
+        stop_test = random.random()
+        if (stop_test < 0.0166):
             swim = stop(swim)
             dot = swim @ old_vector
             angles.append(dot)
