@@ -15,6 +15,7 @@ time_tot = 5*60 #Total sim time in seconds
 run_speed = 20
 #Corresponding frequency-needs to be 100Hz
 freq = 100
+Correction = run_speed/freq
 #Total steps
 steps = time_tot*freq
 #mean stop duration in seconds and corresponding variables
@@ -168,9 +169,9 @@ for i in range(no_runs):
         ypos_arr.append(y_pos)
         zpos_arr.append(z_pos)
         #Add  vector to each position
-        x_pos = x_pos + swim[0]/4.642
-        y_pos = y_pos + swim[1]/4.642
-        z_pos = z_pos + swim[2]/4.642
+        x_pos = x_pos + swim[0]/Correction
+        y_pos = y_pos + swim[1]/Correction
+        z_pos = z_pos + swim[2]/Correction
         #Reset vector to an old vector
         vectors.append(swim)
         #Apply the tumble function to tumble 60* with a random rotation about the z axis
