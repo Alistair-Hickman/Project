@@ -7,23 +7,22 @@ import math
 from numpy import savetxt
 MSD_results = []
 MAD_results = []
-
-
+Time = []
 
 time_tot = 5*60 #Total sim time in seconds
 #Run speed in microns/second
-run_speed = 20
+run_speed = 20.0
 #Corresponding frequency-needs to be 100Hz
-freq = 100
-Correction = run_speed/freq
+freq = 100.0
+Correction = np.sqrt(((run_speed/freq)*(run_speed/freq))/3)
 #Total steps
 steps = time_tot*freq
 #mean stop duration in seconds and corresponding variables
-mean_stop =  1
+mean_stop =  1.0
 stop_steps = mean_stop * freq
 stop_lambd = 1.0/stop_steps
 #mean run time in seconds and corresponding variables
-mean_run = 3
+mean_run = 3.0
 run_steps = mean_run * freq
 run_lambd = 1.0/run_steps
 
@@ -190,9 +189,15 @@ ax.set_zlabel('Z axis(um)')
 ax.set_title("R.Spheroides Trajectory")
 plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
  #Combine the arrays into a single array, transpose and save it as a .csv file.
-pos_arr = np.array([xpos_arr, ypos_arr, zpos_arr])
+times = 0.0
+for i in range(len(xpos_arr)):
+     times += 0.01
+     Time.append(times)
+pos_arr = np.array([Time,xpos_arr, ypos_arr, zpos_arr])
 pos_arr = pos_arr.T
-np.savetxt('trajectory_file.csv', pos_arr)
+
+f = open('trajectory_file.csv', "a")
+np.savetxt(f, pos_arr, header='trajectory')
 
 
 Mean_S_Ang_Disp=MAD(angles)
