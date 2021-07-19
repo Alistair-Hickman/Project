@@ -5,59 +5,65 @@ import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import math
 from numpy import savetxt
-MSD_results = []
-MAD_results = []
-Time = []
 
-time_tot = 5*60 #Total sim time in seconds
-#Run speed in microns/second
-run_speed = 20.0
-#Corresponding frequency-needs to be 100Hz
-freq = 100.0
-Correction = np.sqrt(((run_speed/freq)*(run_speed/freq))/3)
-#Total steps
-steps = time_tot*freq
-#mean stop duration in seconds and corresponding variables
-mean_stop =  1.0
-stop_steps = mean_stop * freq
-stop_lambd = 1.0/stop_steps
-#mean run time in seconds and corresponding variables
-mean_run = 3.0
-run_steps = mean_run * freq
-run_lambd = 1.0/run_steps
+Particles = 5
 
-no_runs = int(time_tot/(mean_run + mean_stop))
-#Mean Square Displacement Fucntion
-def MSD(pos_arr):
+for l in range(Particles):
+
+ MSD_results = []
+ MAD_results = []
+ Time = []
+
+ time_tot = 5*60 #Total sim time in seconds
+ #Run speed in microns/second
+ run_speed = 20.0
+ #Corresponding frequency-needs to be 100Hz
+ freq = 100.0
+ Correction = np.sqrt(((run_speed/freq)*(run_speed/freq))/3)
+ #Total steps
+ steps = time_tot*freq
+ #mean stop duration in seconds and corresponding variables
+ mean_stop =  1.0
+ stop_steps = mean_stop * freq
+ stop_lambd = 1.0/stop_steps
+ #mean run time in seconds and corresponding variables
+ mean_run = 3.0
+ run_steps = mean_run * freq
+ run_lambd = 1.0/run_steps
+
+ no_runs = int(time_tot/(mean_run + mean_stop))
+ #Mean Square Displacement Fucntion
+
+ def MSD(pos_arr):
   MSD_values = []
   displacements = []
   tau = []
 
-def MAD(angles):
-  MAD_values = []
-  ang_displacements = []
+ def MAD(angles):
+   MAD_values = []
+   ang_displacements = []
 
-  for i in range(1, len(angles)):
-    ang_sq = angles[i] * angles[i]
-    ang_displacements.append(ang_sq)
-  MSAD = np.mean(ang_displacements)
-  return MSAD
+   for i in range(1, len(angles)):
+     ang_sq = angles[i] * angles[i]
+     ang_displacements.append(ang_sq)
+   MSAD = np.mean(ang_displacements)
+   return MSAD
 
  #Rotate about the y axis
-def rotate_y(alpha):
-    R_y = np.array([[np.cos(alpha), 0, np.sin(alpha)],
+ def rotate_y(alpha):
+     R_y = np.array([[np.cos(alpha), 0, np.sin(alpha)],
                     [0, 1, 0],
                     [-1*np.sin(alpha), 0, np.cos(alpha)]])
-    return R_y
+     return R_y
 
 #ROtate about the z axis
-def rotate_z(psi):
-    R_z = np.array([[np.cos(psi), -1*np.sin(psi), 0],
+ def rotate_z(psi):
+     R_z = np.array([[np.cos(psi), -1*np.sin(psi), 0],
                     [np.sin(psi), np.cos(psi), 0],
                     [0,0,1]])
-    return R_z
-#Overall rotte function, calls both functions above.
-def rotate(vector):
+     return R_z
+ #Overall rotte function, calls both functions above.
+ def rotate(vector):
     #Definition of variables within function
     vector_z = float(np.array([vector[2]]))
     vector_y = float(np.array([vector[1]]))
@@ -88,7 +94,7 @@ def rotate(vector):
 
     return new_vector
 
-def stop(swim):
+ def stop(swim):
     #Stop duration in uniform between 0.5-1.5s
     stop_duration = random.expovariate(stop_lambd)
     #Needs int rounding but allows stop duration to nearest 0.01s. Okay, could be better
@@ -101,7 +107,7 @@ def stop(swim):
         vectors.append(swim)
     return swim
 
-def stop_rotate(vector):
+ def stop_rotate(vector):
     #Definition of variables within function
     vector_z = float(np.array([vector[2]]))
     vector_y = float(np.array([vector[1]]))
@@ -136,27 +142,27 @@ def stop_rotate(vector):
  #Works as number of trajectories per step
 
  #Generate the starting position
-x_pos,y_pos,z_pos = (0, 0, 0)
+ x_pos,y_pos,z_pos = (0, 0, 0)
 
  #Generate the three arrays in which to store the coordinates
-xpos_arr = []
-ypos_arr = []
-zpos_arr = []
+ xpos_arr = []
+ ypos_arr = []
+ zpos_arr = []
  #define initial vector
-x=0
-y=0
-z=1
-swim = np.array([x,
+ x=0
+ y=0
+ z=1
+ swim = np.array([x,
                  y,
                  z])
-old_vector = np.array([x,
+ old_vector = np.array([x,
                        y,
                        z])
-vectors = []
-angles = []
+ vectors = []
+ angles = []
 
  #first loop
-for i in range(no_runs):
+ for i in range(no_runs):
     step = []
     #second loop is run through once per step, generating a new x, y & z vector
     #These are added to the previous values
@@ -180,30 +186,36 @@ for i in range(no_runs):
     dot = swim @ old_vector
     angles.append(dot)
 
-#The arrays are plotted in 3 dimensions against each other
-ax = plt.axes(projection='3d')
-ax.plot3D(xpos_arr, ypos_arr, zpos_arr)
-ax.set_xlabel('X axis(um)')
-ax.set_ylabel('Y axis(um)')
-ax.set_zlabel('Z axis(um)')
-ax.set_title("R.Spheroides Trajectory")
-plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
+ #The arrays are plotted in 3 dimensions against each other
+ ax = plt.axes(projection='3d')
+ ax.plot3D(xpos_arr, ypos_arr, zpos_arr)
+ ax.set_xlabel('X axis(um)')
+ ax.set_ylabel('Y axis(um)')
+ ax.set_zlabel('Z axis(um)')
+ ax.set_title("R.Spheroides Trajectory")
+ plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
  #Combine the arrays into a single array, transpose and save it as a .csv file.
-times = 0.0
-for i in range(len(xpos_arr)):
+ times = 0.0
+ for i in range(len(xpos_arr)):
      times += 0.01
      Time.append(times)
-pos_arr = np.array([Time,xpos_arr, ypos_arr, zpos_arr])
-pos_arr = pos_arr.T
-
-f = open('trajectory_file.csv', "a")
-np.savetxt(f, pos_arr, header='trajectory')
+ pos_arr = np.array([Time,xpos_arr, ypos_arr, zpos_arr])
+ pos_arr = pos_arr.T
 
 
-Mean_S_Ang_Disp=MAD(angles)
-Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
-print("MAD=", Mean_Ang_Disp)
+ path = "/Users/alistair/Documents/Project/Scripts/Trajectories/trajectory_" + str(l) + ".csv"
+ H = open(path, "w")
+ np.savetxt(H, pos_arr)
 
-v_avrg = (run_speed*mean_run)/(mean_run+mean_stop/run_speed)
-D_ld = (v_avrg*v_avrg*(mean_run+(mean_stop/run_speed)))/(3*(1-np.cos(Mean_Ang_Disp)))
-print("D_ld=", D_ld)
+
+ Mean_S_Ang_Disp=MAD(angles)
+ Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
+ print("MAD=", Mean_Ang_Disp)
+
+ v_avrg = (run_speed*mean_run)/(mean_run+mean_stop/run_speed)
+ D_ld = (v_avrg*v_avrg*(mean_run+(mean_stop/run_speed)))/(3*(1-np.cos(Mean_Ang_Disp)))
+ print("D_ld=", D_ld)
+
+ MAD_results.clear()
+ MSD_results.clear()
+ Time.clear()
