@@ -195,7 +195,7 @@ for l in range(Particles):
  ax.set_title("R.Spheroides Trajectory")
  plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
  #Combine the arrays into a single array, transpose and save it as a .csv file.
- times = 0.0
+ times = 0.00
  for i in range(len(xpos_arr)):
      times += 0.01
      Time.append(times)
