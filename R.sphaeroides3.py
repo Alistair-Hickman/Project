@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import math
 from numpy import savetxt
+import pandas as pd
 
 Particles = 5
 
@@ -19,7 +20,7 @@ for l in range(Particles):
  run_speed = 20.0
  #Corresponding frequency-needs to be 100Hz
  freq = 100.0
- Correction = np.sqrt(((run_speed/freq)*(run_speed/freq))/3)
+ Correction = run_speed/freq
  #Total steps
  steps = time_tot*freq
  #mean stop duration in seconds and corresponding variables
@@ -174,9 +175,9 @@ for l in range(Particles):
         ypos_arr.append(y_pos)
         zpos_arr.append(z_pos)
         #Add  vector to each position
-        x_pos = x_pos + swim[0]/Correction
-        y_pos = y_pos + swim[1]/Correction
-        z_pos = z_pos + swim[2]/Correction
+        x_pos = x_pos + swim[0]*Correction
+        y_pos = y_pos + swim[1]*Correction
+        z_pos = z_pos + swim[2]*Correction
         #Reset vector to an old vector
         vectors.append(swim)
         #Apply the tumble function to tumble 60* with a random rotation about the z axis
@@ -194,6 +195,7 @@ for l in range(Particles):
  ax.set_zlabel('Z axis(um)')
  ax.set_title("R.Spheroides Trajectory")
  plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
+
  #Combine the arrays into a single array, transpose and save it as a .csv file.
  times = 0.00
  for i in range(len(xpos_arr)):
@@ -201,20 +203,19 @@ for l in range(Particles):
      Time.append(times)
  pos_arr = np.array([Time,xpos_arr, ypos_arr, zpos_arr])
  pos_arr = pos_arr.T
-
-
+ df = pd.DataFrame(pos_arr, columns = ["Time(S)", "X", "Y", "Z"])
  path = "/Users/alistair/Documents/Project/Scripts/Trajectories/trajectory_" + str(l) + ".csv"
- H = open(path, "w")
- np.savetxt(H, pos_arr)
+ df.to_csv(path, sep=""\t", delimeter = ",\n")
 
+ print("Run", str(l), "complete")
 
- Mean_S_Ang_Disp=MAD(angles)
- Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
- print("MAD=", Mean_Ang_Disp)
+ #Mean_S_Ang_Disp=MAD(angles)
+ #Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
+ #print("MAD=", Mean_Ang_Disp)
 
- v_avrg = (run_speed*mean_run)/(mean_run+mean_stop/run_speed)
- D_ld = (v_avrg*v_avrg*(mean_run+(mean_stop/run_speed)))/(3*(1-np.cos(Mean_Ang_Disp)))
- print("D_ld=", D_ld)
+ #v_avrg = (run_speed*mean_run)/(mean_run+mean_stop/run_speed)
+ #D_ld = (v_avrg*v_avrg*(mean_run+(mean_stop/run_speed)))/(3*(1-np.cos(Mean_Ang_Disp)))
+ #print("D_ld=", D_ld)
 
  MAD_results.clear()
  MSD_results.clear()
