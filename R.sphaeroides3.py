@@ -205,7 +205,7 @@ for l in range(Particles):
  pos_arr = pos_arr.T
  df = pd.DataFrame(pos_arr, columns = ["Time(S)", "X", "Y", "Z"])
  path = "/Users/alistair/Documents/Project/Scripts/Trajectories/trajectory_" + str(l) + ".csv"
- df.to_csv(path, sep=""\t", delimeter = ",\n")
+ df.to_csv(path, sep="\t")
 
  print("Run", str(l), "complete")
 
