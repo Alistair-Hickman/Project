@@ -11,10 +11,11 @@ y_col = df["Y"]
 z_col = df["Z"]
 
 coords = []
+#Periodic boundaries with 20% buffer
 upper_boundary = int(1024*1.2)
 lower_boundary = int(0-(upper_boundary - 1024))
 #Gauss_func =
-sigma = 20.0
+sigma = 5.0
 #Set up image array and reserve memory using np.zeros()
 x, y = 1024, 1024
 data = np.zeros((x, y, 3), dtype=np.uint8)
@@ -22,7 +23,7 @@ width = 5.0 #width in microns
 ppm = float(x)/width #Calculate pixels per micron
 
 
-for i in range(100):
+for i in range(240):
     #Calculate x and y positions by converting array position to pixel values
     x_pos = int((x_col[i]*ppm)+512)
     y_pos = int((y_col[i]*ppm)+512)
@@ -39,7 +40,7 @@ for i in range(100):
     for j in range(x):
         for k in range(y):
             val = 255.0 * math.exp(-((j-x_pos)*(j-x_pos))/(2.0 * sigma * sigma)) * math.exp(-((k-y_pos)*(k-y_pos))/(2.0 * sigma * sigma))
-            data[j,k] = [0,0,val]
+            data[j,k] = [val,val,val]
 
     #Values are inserted into array for bliue square, will change with functions
     #to iterate over array and assign colour values normally
