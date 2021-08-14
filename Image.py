@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import math
 from PIL import Image
-for ii in range (5):
+
 open_path = "/Users/alistair/Documents/Project/Scripts/Trajectories.nosync/trajectory_1.csv"
 df = pd.read_csv(open_path, usecols = ["X", "Y", "Z"], sep = "\t")
 x_col = df["X"]
