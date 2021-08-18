@@ -18,7 +18,7 @@ z_con = []
 
 no_frames = 240
 
-no_bugs = 2
+no_bugs = 3
 
 for ii in range (no_bugs):
   open_path = "/Users/alistair/Documents/Project/Scripts/Trajectories.nosync/trajectory_" + str(ii) + ".csv"
@@ -41,10 +41,10 @@ coords = []
 upper_boundary = int(1024*1.2)
 lower_boundary = int(0-(upper_boundary - 1024))
 
-q = 40
-p = np.sqrt(q)
+q = 128
+p = -1*np.sqrt(q)
 
-sigma = 2.5
+sigma = 5.0
 #Set up image array and reserve memory using np.zeros()
 x, y = 1024, 1024
 data = np.zeros((x, y, 3), dtype=np.uint8)
@@ -57,7 +57,7 @@ for i in range(no_frames):
      #Calculate x and y positions by converting array position to pixel values
      x_pos.append(int((x_vals[ii][i]*ppm)+512))
      y_pos.append(int((y_vals[ii][i]*ppm)+512))
-     z_con.append(int((z_vals[ii][i]-p)*(z_vals[ii][i]-p)-q))
+     z_con.append(int(np.sqrt(z_vals[ii][i]*z_vals[ii][i]+2.0*z_vals[ii][i]*p+p*p)+q))
 
     #Periodic boudnary conditions - 20% buffer either side, will reenter opposite side of array.
     #Check logic - code seems good

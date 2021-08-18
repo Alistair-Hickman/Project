@@ -1,19 +1,22 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import math
 from PIL import Image
 from multiprocessing import Pool
 
-x_col = []
-y_col = []
-z_col = []
+x_col = {}
+y_col = {}
+z_col = {}
+
+x_vals = []
+y_vals = []
+z_vals = []
 
 x_pos = []
 y_pos = []
 z_con = []
 
-no_frames = 10
+no_frames = 240
 
 no_bugs = 2
 
@@ -23,20 +26,25 @@ for ii in range (no_bugs):
   x_bug = df["X"]
   y_bug = df["Y"]
   z_bug = df["Z"]
-  x_col.append(x_bug)
-  y_col.append(y_bug)
-  z_col.append(z_bug)
-  print("test_1")
+  x_col["X%s" %ii] = x_bug
+  x_vals.append(x_col["X%s" %ii] )
+
+  y_col["Y%s" %ii] = y_bug
+  y_vals.append(y_col["Y%s" %ii])
+
+  #z_col["Z%s" %ii] = z_bug
+  #z_vals.append(z_col["Z%s" %ii])
+
 
 coords = []
 #Periodic boundaries with 20% buffer
 upper_boundary = int(1024*1.2)
 lower_boundary = int(0-(upper_boundary - 1024))
 
-#q = 128
-#p = -0.5*np.sqrt(q)
+q = 128
+p = -1*np.sqrt(q)
 
-sigma = 5.0
+sigma = 2.5
 #Set up image array and reserve memory using np.zeros()
 x, y = 1024, 1024
 data = np.zeros((x, y, 3), dtype=np.uint8)
@@ -45,32 +53,32 @@ ppm = float(x)/width #Calculate pixels per micron
 
 
 for i in range(no_frames):
-    for jj in range(i, (i+no_bugs_1)):
+    for ii in range(no_bugs):
      #Calculate x and y positions by converting array position to pixel values
-     x_pos.append(int((x_col[jj][i]*ppm)+512))
-     y_pos.append(int((y_col[jj][i]*ppm)+512))
-     print("Test_2")
-     #z_con.append((z_col[jj][i]-p)*(z_col[jj][i]-p)-q)
+     x_pos.append(int((x_vals[ii][i]*ppm)+512))
+     y_pos.append(int((y_vals[ii][i]*ppm)+512))
+     #z_con.append(int(np.sqrt(z_vals[ii][i]*z_vals[ii][i]+2.0*z_vals[ii][i]*p+p*p)+q))
 
     #Periodic boudnary conditions - 20% buffer either side, will reenter opposite side of array.
     #Check logic - code seems good
-    #if((abs(x_pos) or abs(y_pos)) > upper_boundary or (abs(y_pos) or abs(x_pos)) < lower_boundary):
-        #x_delta = x_pos - 512
-        #y_delta = y_pos - 512
-        #x_pos = 512 - x_delta
-        #y_pos = 512 - y_delta
+    for l in range (len(x_pos)):
+     if((abs(x_pos[l]) or abs(y_pos[l])) > upper_boundary or (abs(y_pos[l]) or abs(x_pos[l])) < lower_boundary):
+        x_delta = x_pos[l] - 512
+        y_delta = y_pos[l] - 512
+        x_pos[l] = 512 - x_delta
+        y_pos[l] = 512 - y_delta
 
     #Create array list of coordinates in pixels of bacteria - optional
-    #coordinates = np.array([i, x_pos, y_pos])
-    #coords.append(coordinates)
+    #coordinates = np.array([i, x_pos, y_pos], dtype=object)
+    #coords.append(x_pos)
 
     for j in range(x):
-        val = 0
         for k in range(y):
-            for kk in range (no_bugs):
-              val += 50*math.exp(-((j-x_pos[kk])*(j-x_pos[kk]))/(2.0 * sigma * sigma)) * math.exp(-((k-y_pos[kk])*(k-y_pos[kk]))/(2.0 * sigma * sigma))
-              data[j,k] = [val,val,val]
-              print("test_3")
+            val = 0
+            for kk in range (len(x_pos)):
+              val = 255*math.exp(-((j-x_pos[kk])*(j-x_pos[kk]))/(2.0 * sigma * sigma)) * math.exp(-((k-y_pos[kk])*(k-y_pos[kk]))/(2.0 * sigma * sigma))
+            data[j,k] = [val,val,val]
+            #print("test_3")
 
     #Values are inserted into array for bliue square, will change with functions
     #to iterate over array and assign colour values normally
@@ -82,7 +90,6 @@ for i in range(no_frames):
     data = np.zeros((x, y, 3), dtype=np.uint8)
     x_pos.clear()
     y_pos.clear()
-    z_pos.clear()
     z_con.clear()
 
 #np.savetxt("/Users/alistair/Documents/Project/Scripts/Frames.nosync/coordinates.txt", coords)
