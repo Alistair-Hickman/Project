@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import math
 from PIL import Image
+
 #from multiprocessing import Pool
 
 x_col = {}
