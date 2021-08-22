@@ -7,7 +7,7 @@ import math
 from numpy import savetxt
 import pandas as pd
 
-Particles = 5
+Particles = 200
 
 for l in range(Particles):
 
@@ -204,10 +204,8 @@ for l in range(Particles):
  pos_arr = np.array([Time,xpos_arr, ypos_arr, zpos_arr])
  pos_arr = pos_arr.T
  df = pd.DataFrame(pos_arr, columns = ["Time(S)", "X", "Y", "Z"])
- path = "/Users/alistair/Documents/Project/Scripts/Trajectories/trajectory_" + str(l) + ".csv"
+ path = "/Users/alistair/Documents/Project/Scripts/Trajectories.nosync/trajectory_" + str(l) + ".csv"
  df.to_csv(path, sep="\t")
-
- print("Run", str(l), "complete")
 
  #Mean_S_Ang_Disp=MAD(angles)
  #Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
