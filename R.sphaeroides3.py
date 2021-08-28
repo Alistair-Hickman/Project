@@ -15,7 +15,7 @@ for l in range(Particles):
  MAD_results = []
  Time = []
 
- time_tot = 5*60 #Total sim time in seconds
+ time_tot = 20 #Total sim time in seconds
  #Run speed in microns/second
  run_speed = 20.0
  #Corresponding frequency-needs to be 100Hz
@@ -141,9 +141,10 @@ for l in range(Particles):
 
  #Generate the number of desired steps(n) with a variable 'steps' = n+1
  #Works as number of trajectories per step
-
+ x_init = random.uniform(-2,2)
+ z_init = random.uniform(-2,2)
  #Generate the starting position
- x_pos,y_pos,z_pos = (0, 0, 0)
+ x_pos,y_pos,z_pos = (x_init, z_init, 0)
 
  #Generate the three arrays in which to store the coordinates
  xpos_arr = []
@@ -152,7 +153,7 @@ for l in range(Particles):
  #define initial vector
  x=0
  y=0
- z=1
+ z=random.choice([-1,1])
  swim = np.array([x,
                  y,
                  z])
@@ -204,7 +205,7 @@ for l in range(Particles):
  pos_arr = np.array([Time,xpos_arr, ypos_arr, zpos_arr])
  pos_arr = pos_arr.T
  df = pd.DataFrame(pos_arr, columns = ["Time(S)", "X", "Y", "Z"])
- path = "/Users/alistair/Documents/Project/Scripts/Trajectories.nosync/trajectory_" + str(l) + ".csv"
+ path = "/Users/alistair/Documents/Project/Scripts/Trajectories2.nosync/trajectory_" + str(l) + ".csv"
  df.to_csv(path, sep="\t")
 
  #Mean_S_Ang_Disp=MAD(angles)
