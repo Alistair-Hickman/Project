@@ -15,7 +15,7 @@ for l in range(Particles):
  MAD_results = []
  Time = []
 
- time_tot = 20 #Total sim time in seconds
+ time_tot = 5*60 #Total sim time in seconds
  #Run speed in microns/second
  run_speed = 20.0
  #Corresponding frequency-needs to be 100Hz
@@ -95,6 +95,14 @@ for l in range(Particles):
 
     return new_vector
 
+ def initial_stop(swim):
+    duration = int(10*freq)
+    swim = np.array([x,y,z])
+    for i in range(duration):
+        swim = stop_rotate(swim)
+    return swim
+
+
  def stop(swim):
     #Stop duration in uniform between 0.5-1.5s
     stop_duration = random.expovariate(stop_lambd)
@@ -141,8 +149,8 @@ for l in range(Particles):
 
  #Generate the number of desired steps(n) with a variable 'steps' = n+1
  #Works as number of trajectories per step
- x_init = random.uniform(-2,2)
- z_init = random.uniform(-2,2)
+ x_init = random.uniform(-50,50)
+ z_init = random.uniform(-50,50)
  #Generate the starting position
  x_pos,y_pos,z_pos = (x_init, z_init, 0)
 
@@ -157,6 +165,8 @@ for l in range(Particles):
  swim = np.array([x,
                  y,
                  z])
+ swim = initial_stop(swim)
+
  old_vector = np.array([x,
                        y,
                        z])
@@ -198,15 +208,15 @@ for l in range(Particles):
  plt.savefig("R.Sphaeroides_trajectory.png",dpi=80)
 
  #Combine the arrays into a single array, transpose and save it as a .csv file.
- times = 0.00
- for i in range(len(xpos_arr)):
-     times += 0.01
-     Time.append(times)
- pos_arr = np.array([Time,xpos_arr, ypos_arr, zpos_arr])
+ #times = 0.00
+ #for i in range(len(xpos_arr)):
+     #times += 0.01
+     #Time.append(times)
+ pos_arr = np.array([xpos_arr, ypos_arr, zpos_arr])
  pos_arr = pos_arr.T
- df = pd.DataFrame(pos_arr, columns = ["Time(S)", "X", "Y", "Z"])
+ df = pd.DataFrame(pos_arr, columns = ["X", "Y", "Z"])
  path = "/Users/alistair/Documents/Project/Scripts/Trajectories2.nosync/trajectory_" + str(l) + ".csv"
- df.to_csv(path, sep="\t")
+ df.to_csv(path, sep = "\t")
 
  #Mean_S_Ang_Disp=MAD(angles)
  #Mean_Ang_Disp=np.sqrt(Mean_S_Ang_Disp)
