@@ -149,10 +149,11 @@ for l in range(Particles):
 
  #Generate the number of desired steps(n) with a variable 'steps' = n+1
  #Works as number of trajectories per step
- x_init = random.uniform(-50,50)
- z_init = random.uniform(-50,50)
+ x_init = random.uniform(-600,600)
+ y_init = random.uniform(-600,600)
+ z_init = random.uniform(-600,600)
  #Generate the starting position
- x_pos,y_pos,z_pos = (x_init, z_init, 0)
+ x_pos,y_pos,z_pos = (x_init, y_init, z_init)
 
  #Generate the three arrays in which to store the coordinates
  xpos_arr = []
