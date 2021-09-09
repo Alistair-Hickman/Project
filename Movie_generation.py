@@ -4,6 +4,7 @@ import math
 from PIL import Image
 import multiprocessing as mp
 
+
 x_col = {}
 y_col = {}
 z_col = {}
@@ -14,56 +15,60 @@ z_vals = []
 
 x_pos = []
 y_pos = []
-z_con = []
+z_pos = []
+z_cons = []
 
 no_bugs = 200
 
 #Periodic boundaries with 20% buffer
-upper_boundary = int(1024*1.2)
-lower_boundary = int(0-(upper_boundary-1024.0))
+upper_boundary = 1024*1.2
+lower_boundary = 0-(upper_boundary-1024.0)
 
 def main_loop(no_bugs):
- q = 128.0
- p = -0.0005
+ #Variables for z quadratic - I = p*z^2 + q
+ q = 128
+ p = -0.005
  sigma = 2.0
- no_frames = 2000
+
+ no_frames = 25000
+ frame_spacing = 100
 #Set up image array and reserve memory using np.zeros()
  x, y = 1024, 1024
  data = np.zeros((x, y, 3), dtype=np.uint8)
- width = 500 #width of image in microns
+ width = 750 #width of image in microns
  ppm = float(x)/width #Calculate pixels per micron
 
 
- for i in range(1, no_frames, 5):
+ for i in range(0,no_frames,frame_spacing):
     for ii in range(no_bugs):
      #Calculate x and y positions by converting array position to pixel values
      x_pos.append(int((x_vals[ii][i]*ppm)+512))
      y_pos.append(int((y_vals[ii][i]*ppm)+512))
-     z_con.append((p*z_vals[ii][i]*z_vals[ii][i])+q)
+     z_pos.append(int((z_vals[ii][i]*ppm)+512))
+
 
     #Periodic boudnary conditions - 20% buffer either side, will reenter opposite side of array.
     #Check logic - code seems good
-    for l in range (len(x_pos)):
-     if((x_pos[l] or y_pos[l]) >= upper_boundary or (y_pos[l] or x_pos[l]) <= lower_boundary):
-        if (x_pos[l] == 0):
-             x_delta = 0.833
-             y_delta = upper_boundary%y_pos[l]
-             x_pos[l] = int(abs(x_delta)*upper_boundary)
-             y_pos[l] = int(abs(y_delta)*upper_boundary)
-        elif (y_pos[l] == 0):
-             x_delta = upper_boundary%x_pos[l]
-             y_delta = 0.833
-             x_pos[l] = int(abs(x_delta)*upper_boundary)
-             y_pos[l] = int(abs(y_delta)*upper_boundary)
-        else :
-             x_delta = upper_boundary%x_pos[l]
-             y_delta = upper_boundary%y_pos[l]
-             x_pos[l] = int(abs(x_delta)*upper_boundary)
-             y_pos[l] = int(abs(y_delta)*upper_boundary)
+    for g in range (len(x_pos)):
+     if(x_pos[g] > upper_boundary or x_pos[g] < lower_boundary):
+         x_pos[g] = int(x_pos[g] % upper_boundary)
+     if(y_pos[g] > upper_boundary or y_pos[g] < lower_boundary):
+         y_pos[g] = int(y_pos[g] % upper_boundary or y_pos[g] < lower_boundary)
+     if(z_pos[g] > upper_boundary or z_pos[g] < lower_boundary):
+         z_pos[g] = int(z_pos[g] % upper_boundary)
 
+    np.savetxt("/Users/alistair/Documents/Project/Scripts/Trajectories2.nosync/z_pos.csv", z_pos)
+    for zz in range(len(z_pos)):
+     z_temp = (z_pos[zz] - 512)/ppm
+     z_con = 0
+     z_con += p*abs(z_temp)*abs(z_temp)
+     if abs(z_con) > q :
+         z_con = 0
+     else:
+         z_con = z_con + q
+     z_cons.append(z_con)
 
-
-
+    np.savetxt("/Users/alistair/Documents/Project/Scripts/Trajectories2.nosync/z_vals.csv", z_cons)
     for ll in range (len(x_pos)):
      x_max = x_pos[ll] + 8
      x_min = x_pos[ll] - 8
@@ -71,21 +76,17 @@ def main_loop(no_bugs):
      y_min = y_pos[ll] - 8
      for j in range(x_min, x_max):
         for k in range(y_min, y_max):
-         if (j < 1024 and j > 0 and k < 1024 and k > 0):
+         if (j < x and j > 0 and k < xc and k > 0):
           val = data[j,k]
-          val += np.uint8(z_con[ll]*math.exp(-((j-x_pos[ll])*(j-x_pos[ll]))/(2.0 * sigma * sigma)) * math.exp(-((k-y_pos[ll])*(k-y_pos[ll]))/(2.0 * sigma * sigma)))
-
-          #data[j,k] = val
+          val += np.uint8(z_cons[ll]*math.exp(-((j-x_pos[ll])*(j-x_pos[ll]))/(2.0 * sigma * sigma)) * math.exp(-((k-y_pos[ll])*(k-y_pos[ll]))/(2.0 * sigma * sigma)))
+          data[j,k] = val
 
 
     #Image inversion code
-    for xx in range(1024):
-        for yy in range(1024):
-          if np.any(data[xx,yy]) > 255.0:
-            data[xx,yy] = 255.0
-          elif np.any(data[xx,yy]) < 0:
-            data[xx,yy] = 0
-          data[xx,yy] = (data[xx,yy]*-1) + 255
+    for xx in range(x):
+        for yy in range(y):
+          data[xx,yy] = (data[xx,yy] * -1) + 255
+
 
     im= Image.fromarray(data)
     im.save("/Users/alistair/Documents/Project/Scripts/Frames2.nosync/Frame_" + str(i) + ".png")
@@ -93,7 +94,8 @@ def main_loop(no_bugs):
     data = np.zeros((x, y, 3), dtype=np.uint8)
     x_pos.clear()
     y_pos.clear()
-    z_con.clear()
+    z_pos.clear()
+    z_cons.clear()
 
  return 0
 
