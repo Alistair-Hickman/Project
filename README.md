@@ -1,5 +1,6 @@
 # Project
 Trajectory Creation:
+
 I believe most parameters are self explanatory including the total simulation time, frequency of position capture. 
 The mean run and stop times can be adjusted as desired (these are done in seconds).
 
@@ -15,6 +16,7 @@ with different numbers. Make sure to include this in whatever file path you choo
 Nothing beyond this should require changing in the code for it to produce the desired trajectories.
 
 Image Creation Script:
+
 This code is slightly more complex but flexible. 
 'No_bugs' is self explanatory.
 'No_frames' is the maximum trajectory step, not the actual number of frames if the spacing between frame is not 1. The number of frames that will be produced
