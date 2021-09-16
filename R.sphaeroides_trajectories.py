@@ -8,14 +8,17 @@ from numpy import savetxt
 import pandas as pd
 
 Particles = 200
-
-for l in range(Particles):
+x_1 = []
+y_1 = []
+z_1 = []
+for l in range(120,200):
 
  MSD_results = []
  MAD_results = []
  Time = []
 
- time_tot = 5*60 #Total sim time in seconds
+ minutes = 80
+ time_tot = minutes*60 #Total sim time in seconds
  #Run speed in microns/second
  run_speed = 20.0
  #Corresponding frequency-needs to be 100Hz
@@ -97,7 +100,6 @@ for l in range(Particles):
 
  def initial_stop(swim):
     duration = int(10*freq)
-    swim = np.array([x,y,z])
     for i in range(duration):
         swim = stop_rotate(swim)
     return swim
@@ -149,9 +151,9 @@ for l in range(Particles):
 
  #Generate the number of desired steps(n) with a variable 'steps' = n+1
  #Works as number of trajectories per step
- x_init = random.uniform(-600,600)
- y_init = random.uniform(-600,600)
- z_init = random.uniform(-600,600)
+ x_init = random.uniform(-450,450)
+ y_init = random.uniform(-450,450)
+ z_init = random.uniform(-450,450)
  #Generate the starting position
  x_pos,y_pos,z_pos = (x_init, y_init, z_init)
 
@@ -160,13 +162,21 @@ for l in range(Particles):
  ypos_arr = []
  zpos_arr = []
  #define initial vector
- x=0
- y=0
- z=random.choice([-1,1])
+ x_vec=random.uniform(-1,1)
+ y_vec=random.uniform(-1,1)
+ z_vec=random.uniform(-1,1)
+
+ x = x_vec/(abs(x_vec + y_vec + z_vec))
+ y = y_vec/(abs(x_vec + y_vec + z_vec))
+ z = z_vec/(abs(x_vec + y_vec + z_vec))
+
  swim = np.array([x,
                  y,
                  z])
- swim = initial_stop(swim)
+
+ x_1.append(swim[0])
+ y_1.append(swim[1])
+ z_1.append(swim[2])
 
  old_vector = np.array([x,
                        y,
@@ -216,7 +226,7 @@ for l in range(Particles):
  pos_arr = np.array([xpos_arr, ypos_arr, zpos_arr])
  pos_arr = pos_arr.T
  df = pd.DataFrame(pos_arr, columns = ["X", "Y", "Z"])
- path = "/Users/alistair/Documents/Project/Scripts/Trajectories2.nosync/trajectory_" + str(l) + ".csv"
+ path = "/Users/alistair/Documents/Project/Scripts/50_trajectories2.nosync/trajectory_" + str(l) + ".csv"
  df.to_csv(path, sep = "\t")
 
  #Mean_S_Ang_Disp=MAD(angles)
@@ -230,3 +240,8 @@ for l in range(Particles):
  MAD_results.clear()
  MSD_results.clear()
  Time.clear()
+ori = np.array([x_1,y_1,z_1])
+ori_arr = ori.T
+
+#path_1 = "/Users/alistair/Documents/Project/Scripts/Orientations.csv"
+#np.savetxt("/Users/alistair/Documents/Project/Scripts/Orientations.csv", ori_arr)
